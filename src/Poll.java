@@ -39,7 +39,7 @@ public class Poll {
                 String formattedPercentage = String.format("%.1f", percentage); 
 
                 if (formattedPercentage.equals("NaN")) {
-                    //formattedPercentage = "0";
+                    formattedPercentage = "0";
                 }
                 
                 message_list.add("["+counter+"] " +option.getOptionName() + " - " + option.getVoteCount() + " ("+ formattedPercentage +"%)");

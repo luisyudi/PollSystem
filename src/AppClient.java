@@ -87,6 +87,7 @@ public class AppClient extends Thread {
         int initialIndex = command.indexOf(" ");
         if (initialIndex == -1) {
             writeMessage("Erro na sintaxe: Nome da votaçao nao encontrado.");
+            return;
         }
 
         command = command.substring(initialIndex + 1);
@@ -111,6 +112,7 @@ public class AppClient extends Thread {
         // Minimum of 2 options
         if (parameters.size() < 3) {
             writeMessage("Uma votação deve possuir pelo menos 2 opções.");
+            return;
         }
 
         // Verifies 'verVoto' and 'timer'
@@ -124,6 +126,7 @@ public class AppClient extends Thread {
                 showVotes = true;
             } else if (!remainingParts[0].equalsIgnoreCase("N")) {
                 writeMessage("'verVoto' deve ser 'S' ou 'N'.");
+                return;
             }
         }
 
@@ -137,18 +140,20 @@ public class AppClient extends Thread {
                     minutes = Integer.parseInt(timeParts[1]);
                     // Format
                     if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-                        writeMessage("Valor para timer invalido.");    
+                        writeMessage("Valor para timer invalido.");
+                        return;
                     }
                 } catch (NumberFormatException e) {
                     writeMessage("Erro na sintaxe: Timer deve estar no formato hh-mm.");
+                    return;
                 }
             }
         }
-         long currentTimeMillis = System.currentTimeMillis();
+        long currentTimeMillis = System.currentTimeMillis();
 
-         // Converts to milliseconds
-         long addedTimeMillis = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
-         long timer = currentTimeMillis + addedTimeMillis;
+        // Converts to milliseconds
+        long addedTimeMillis = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+        long timer = currentTimeMillis + addedTimeMillis;
 
         //Creates the poll
         Poll new_poll = new Poll(parameters.get(0), this.user, showVotes, timer);
@@ -189,10 +194,12 @@ public class AppClient extends Thread {
             poll_number = Integer.valueOf(command.substring(0));
         } catch (Exception e) {
             writeMessage("Numero de votacao invalido");
+            return;
         }
 
         if (poll_number - 1 < 0 || poll_number > polls.size()) {
             writeMessage("Numero de votacao invalido");
+            return;
         }
 
         Poll poll = polls.get(poll_number - 1);
@@ -207,7 +214,7 @@ public class AppClient extends Thread {
                 bufferedWriter.write(messages.get(i));
                 bufferedWriter.newLine();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // TODO: handle exception
         }
         
@@ -223,10 +230,12 @@ public class AppClient extends Thread {
             poll_number = Integer.valueOf(command.substring(0, auxIndex));
         } catch (Exception e) {
             writeMessage("Numero de votacao invalido");
+            return;
         }
 
         if (polls.get(poll_number - 1).getStatus().equals("Encerrado")) {
             writeMessage("Votacao ja foi encerrada");
+            return;
         }
 
         command = command.substring(auxIndex + 1);
@@ -236,11 +245,13 @@ public class AppClient extends Thread {
             option_number = Integer.valueOf(command);
         } catch (Exception e) {
             writeMessage("Opcao invalida");
+            return;
         }
 
         //Option_number < 0 or option_number > number of options in poll
         if (option_number < 0 || option_number > polls.get(poll_number).getOptions_list().size()) {
             writeMessage("Opcao invalida");
+            return;
         }
 
 
@@ -251,7 +262,6 @@ public class AppClient extends Thread {
         }else {
             writeMessage("Usuario ja votou nessa votacao");
         }
-
     }
 
     private void endPoll(String command){
@@ -263,6 +273,7 @@ public class AppClient extends Thread {
             poll_number = Integer.valueOf(command.substring(0));
         } catch (Exception e) {
             writeMessage("Numero de votacao invalido.");
+            return;
         }
 
         if (poll_number > 0 && poll_number <= polls.size()) {
@@ -280,26 +291,7 @@ public class AppClient extends Thread {
     }
 
     private void help(){
-        try {
-            this.bufferedWriter.write("Os comandos disponiveis sao: ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("-criarvotacao ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("-listarvotacoes ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("-vervotacao ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("-votar ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("-encerrar ");
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.write("Leia o protocolo para mais informacoes na utilizacao de comandos");
-            this.bufferedWriter.newLine();
-
-            return;
-        } catch (IOException ioexception) {
-            // TODO: handle exception
-        }
+        writeMessage("Os comandos disponiveis sao:\n-criarvotacao\n-listarvotacoes\n-vervotacao\n-votar\n-encerrar\nLeia o protocolo para mais informacoes na utilizacao de comandos");
     }
 
     @Override
@@ -315,14 +307,17 @@ public class AppClient extends Thread {
                         bufferedWriter.write("Comando nao encontrado. Digite help para ver os comandos disponiveis");
                         bufferedWriter.newLine();
                         bufferedWriter.flush();     
-                        
                     } catch (IOException e) {
                         // TODO: handle exception
                         break;
                     }
                 }else{
                     runCommand(commandType, command);
-                    this.bufferedWriter.flush();
+                    try {
+                        this.bufferedWriter.flush();
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
