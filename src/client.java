@@ -17,7 +17,24 @@ public class client {
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            // TODO: handle exception
+            closeClient(clientSocket, bufferedReader, bufferedWriter);
+        }
+    }
+
+    public static void closeClient(Socket socket, BufferedReader bf, BufferedWriter bw){
+        System.out.println("Conexao Perdida");
+        try {
+            if (bf != null) {
+                bf.close();
+            }
+            if (bw != null) {
+                bw.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -52,7 +69,7 @@ public class client {
                 }
                 System.out.println(response.toString()); 
             } catch (IOException e) {
-                // TODO: handle exception
+                closeClient(client.clientSocket, client.bufferedReader, client.bufferedWriter);
             }
             
         } 

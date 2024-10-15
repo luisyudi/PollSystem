@@ -59,7 +59,7 @@ public class Poll {
         Collections.sort(this.options_list, new Comparator<Option>() {
             @Override
             public int compare(Option o1, Option o2) {
-                return Integer.compare(o2.getVoteCount(), o1.getVoteCount()); // Ordem decrescente
+                return Integer.compare(o2.getVoteCount(), o1.getVoteCount()); //Stackoverflow
             }
         });
     }
@@ -79,7 +79,7 @@ public class Poll {
     }
 
     public void checkTimer(){
-        if (this.timer >= System.currentTimeMillis()) {
+        if (System.currentTimeMillis() >= this.timer) {
             this.setStatus("Encerrado");
             this.sort_poll();
             this.setShowVotes(true);

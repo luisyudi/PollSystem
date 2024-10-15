@@ -23,18 +23,34 @@ public class AppClient extends Thread {
             this.clientSocket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            //readline
         } catch (IOException e) {
-            // TODO: handle exception
+            closeClient(clientSocket, bufferedReader, bufferedWriter);
         }
         
+    }
+
+    public static void closeClient(Socket socket, BufferedReader bf, BufferedWriter bw){
+        System.out.println("Conexao Perdida");
+        try {
+            if (bf != null) {
+                bf.close();
+            }
+            if (bw != null) {
+                bw.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeMessage(String message){
         try {
             this.bufferedWriter.write(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            closeClient(clientSocket, bufferedReader, bufferedWriter);
         }
     }
 
@@ -115,7 +131,7 @@ public class AppClient extends Thread {
             return;
         }
 
-        // Verifies 'verVoto' and 'timer'
+        // verVoto
         String remainingCommand = command.trim();
         boolean showVotes = false;
         int hours = 0, minutes = 0;
@@ -215,7 +231,7 @@ public class AppClient extends Thread {
                 bufferedWriter.newLine();
             }
         } catch (IOException e) {
-            // TODO: handle exception
+            closeClient(clientSocket, bufferedReader, bufferedWriter);
         }
         
     }
@@ -308,7 +324,7 @@ public class AppClient extends Thread {
                         bufferedWriter.newLine();
                         bufferedWriter.flush();     
                     } catch (IOException e) {
-                        // TODO: handle exception
+                        closeClient(clientSocket, bufferedReader, bufferedWriter);
                         break;
                     }
                 }else{
@@ -316,12 +332,11 @@ public class AppClient extends Thread {
                     try {
                         this.bufferedWriter.flush();
                     } catch (Exception e) {
-                        // TODO: handle exception
+                        closeClient(clientSocket, bufferedReader, bufferedWriter);
                     }
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                closeClient(clientSocket, bufferedReader, bufferedWriter);
                 break;
             }
         }
